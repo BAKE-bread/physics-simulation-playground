@@ -1,0 +1,11 @@
+{
+  "name": "physical-simulation-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node ./tests/numerics.mjs",
+    "dev": "node ./scripts/dev-server.mjs",
+    "serve": "node ./scripts/dev-server.mjs --port 4173"
+  }
+}

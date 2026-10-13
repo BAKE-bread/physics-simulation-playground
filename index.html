@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="刚体、软体与流体的实时数值模拟实验台" />
+    <title>物理模拟实验台</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">NUMERICAL PHYSICS LAB</p>
+          <h1>物理模拟实验台</h1>
+        </div>
+        <div class="top-status"><span class="status-dot"></span><span id="runStatus">运行中</span><span id="fpsReadout">60 FPS</span></div>
+      </header>
+
+      <section class="workbench" aria-label="实时物理模拟实验台">
+        <aside class="control-panel" aria-label="实验配置">
+          <section class="panel-section">
+            <h2>求解器家族</h2>
+            <div class="family-tabs" role="tablist" aria-label="选择求解器家族">
+              <button class="family-tab is-active" type="button" data-family="rigid" role="tab" aria-selected="true">刚体</button>
+              <button class="family-tab" type="button" data-family="soft" role="tab" aria-selected="false">软体</button>
+              <button class="family-tab" type="button" data-family="fluid" role="tab" aria-selected="false">流体</button>
+              <button class="family-tab" type="button" data-family="field" role="tab" aria-selected="false">场</button>
+            </div>
+          </section>
+
+          <section class="panel-section">
+            <label for="scenarioSelect">代表性问题</label>
+            <select id="scenarioSelect">
+              <option value="stack">堆叠与摩擦接触</option>
+              <option value="collision">斜坡冲量碰撞</option>
+            </select>
+            <p id="scenarioHint" class="hint">拖动物体，观察角动量、摩擦冲量与接触收敛。</p>
+          </section>
+
+          <section class="panel-section compact-controls">
+            <div class="button-row">
+              <button id="playButton" type="button" class="primary-button">暂停</button>
+              <button id="stepButton" type="button">单步</button>
+              <button id="resetButton" type="button">重置</button>
+              <button id="shuffleButton" type="button" title="换一个随机初始布局">打乱</button>
+            </div>
+            <label class="range-label" for="speedInput">时间倍率 <output id="speedValue">1.00×</output></label>
+            <input id="speedInput" type="range" min="0.25" max="1.8" step="0.05" value="1" />
+            <label class="range-label" for="gravityInput">重力 <output id="gravityValue">9.8</output></label>
+            <input id="gravityInput" type="range" min="0" max="16" step="0.1" value="9.8" />
+            <label class="range-label" for="qualityInput">求解质量 <output id="qualityValue">中</output></label>
+            <input id="qualityInput" type="range" min="1" max="3" step="1" value="2" />
+            <label class="switch-label"><input id="adaptiveInput" type="checkbox" checked /> 自适应迭代预算</label>
+          </section>
+
+          <section class="panel-section method-note">
+            <h2>本实验的数值承诺</h2>
+            <p>固定步长与受限子步进保障稳定性；运行时根据帧率调整迭代预算。显示的残差不是“真实度评分”，而是不同方案各自的守恒／约束诊断。</p>
+          </section>
+        </aside>
+
+        <section class="stage-panel">
+          <div class="stage-head">
+            <div><p id="familyLabel" class="eyebrow">RIGID BODY</p><h2 id="scenarioTitle">堆叠与摩擦接触</h2></div>
+            <p id="interactionHint">拖动任一物体施加运动学抓取。</p>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="simCanvas" aria-label="实时物理模拟画布">当前浏览器不支持 Canvas。</canvas>
+            <div class="canvas-label label-left">y</div><div class="canvas-label label-bottom">x</div>
+          </div>
+          <div class="legend"><span class="legend-line cyan"></span><span id="legendText">动态刚体</span><span class="legend-line amber"></span><span id="legendText2">约束／接触</span></div>
+        </section>
+
+        <aside class="diagnostics-panel" aria-label="数值诊断">
+          <section class="panel-section">
+            <h2>实时诊断</h2>
+            <dl class="metrics">
+              <div><dt>自由度实体</dt><dd id="entitiesMetric">—</dd></div>
+              <div><dt>邻域／约束</dt><dd id="contactsMetric">—</dd></div>
+              <div><dt>能量代理</dt><dd id="energyMetric">—</dd></div>
+              <div><dt>残差</dt><dd id="residualMetric">—</dd></div>
+              <div><dt>积分步数</dt><dd id="stepsMetric">—</dd></div>
+              <div><dt>帧率</dt><dd id="fpsMetric">—</dd></div>
+            </dl>
+          </section>
+          <section class="panel-section">
+            <h2>当前离散化</h2>
+            <p id="methodMetric" class="method-value">—</p>
+          </section>
+          <section class="panel-section experiment-list">
+            <h2>实验矩阵</h2>
+            <ul>
+              <li><span>刚体</span> 冲量接触、SAT 碰撞与摩擦</li>
+              <li><span>软体</span> XPBD 布料／水球与共旋 FEM</li>
+              <li><span>流体</span> 投影烟流、LBM 绕流、SPH 与浅水波</li>
+              <li><span>场</span> 热传导 FEM、波动方程、反应扩散与 Boids</li>
+            </ul>
+          </section>
+        </aside>
+      </section>
+      <footer>点击并拖动画布与当前场景互动；快捷键：<kbd>空格</kbd> 暂停／继续，<kbd>S</kbd> 单步，<kbd>R</kbd> 重置，<kbd>1</kbd>–<kbd>4</kbd> 切换求解器家族。参数可安全地在运行中切换。</footer>
+    </main>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
